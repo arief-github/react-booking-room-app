@@ -16,7 +16,6 @@ export default function BookablesList () {
     setBookableIndex(i => (i + 1) % bookablesInGroup.length);
   }
 
-  // add comment for this function
   function changeGroup(event) {
     setGroup(event.target.value)
     setBookableIndex(0)
