@@ -1,24 +1,40 @@
-import {useState, Fragment} from 'react';
+import {useReducer} from 'react';
 import {bookables, sessions, days} from "../../static.json";
 import {FaArrowRight} from "react-icons/fa";
 
-export default function BookablesList () {
-  const [group, setGroup] = useState("Kit");
-  const bookablesInGroup = bookables.filter(b => b.group === group);
-  const [bookableIndex, setBookableIndex] = useState(0);
-  const groups = [...new Set(bookables.map(b => b.group))];
+import reducer, { initialState } from '../../reducer';
 
+export default function BookablesList () {
+  const [state, dispatch] = useReducer(reducer, initialState);
+
+  const { group, bookableIndex, bookables, hasDetails } = state;
+
+  const bookablesInGroup = bookables.filter(b => b.group === group);
+  const groups = [...new Set(bookables.map(b => b.group))];
   const bookable = bookablesInGroup[bookableIndex];
 
-  const [hasDetails, setHasDetails] = useState(false);
-
   function nextBookable () {
-    setBookableIndex(i => (i + 1) % bookablesInGroup.length);
+    dispatch({
+      type: 'NEXT_BOOKABLE',
+    })
+  }
+
+  function toggleDetails () {
+    dispatch({ type: 'TOGGLE_HAS_DETAILS' })
+  }
+
+  function changeBookable(selectedIndex) {
+    dispatch({
+      type: 'SET_BOOKABLE',
+      payload: selectedIndex
+    })
   }
 
   function changeGroup(event) {
-    setGroup(event.target.value)
-    setBookableIndex(0)
+    dispatch({
+      type: 'SET_GROUP',
+      payload: event.target.value
+    })
   }
 
   return (
@@ -39,7 +55,7 @@ export default function BookablesList () {
             >
               <button
                 className="btn"
-                onClick={() => setBookableIndex(i)}
+                onClick={() => changeBookable(i)}
               >
                 {b.title}
               </button>
@@ -70,7 +86,7 @@ export default function BookablesList () {
                   <input
                     type="checkbox"
                     checked={hasDetails}
-                    onChange={() => setHasDetails(has => !has)}
+                    onChange={toggleDetails}
                   />
                   Show Details
                 </label>
