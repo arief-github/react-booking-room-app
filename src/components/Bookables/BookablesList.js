@@ -1,11 +1,12 @@
 import {useReducer} from 'react';
-import {bookables, sessions, days} from "../../static.json";
+import {sessions, days} from "../../static.json";
 import {FaArrowRight} from "react-icons/fa";
 
-import reducer, { initialState } from '../../reducer';
+import {BookingReducer} from '../../reducer';
+import { initialState } from '../../reducer/BookingReducer';
 
 export default function BookablesList () {
-  const [state, dispatch] = useReducer(reducer, initialState);
+  const [state, dispatch] = useReducer(BookingReducer, initialState);
 
   const { group, bookableIndex, bookables, hasDetails } = state;
 
