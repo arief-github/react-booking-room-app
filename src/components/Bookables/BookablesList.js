@@ -1,18 +1,34 @@
-import {useReducer} from 'react';
+import {useReducer, useEffect} from 'react';
 import {sessions, days} from "../../static.json";
 import {FaArrowRight} from "react-icons/fa";
 
 import {BookingReducer} from '../../reducer';
 import { initialState } from '../../reducer/BookingReducer';
+import getData from '../../utils/api';
+import Spinner from '../UI/Spinner';
 
 export default function BookablesList () {
   const [state, dispatch] = useReducer(BookingReducer, initialState);
 
-  const { group, bookableIndex, bookables, hasDetails } = state;
+  const { group, bookableIndex, bookables, hasDetails, isLoading, error } = state;
 
   const bookablesInGroup = bookables.filter(b => b.group === group);
   const groups = [...new Set(bookables.map(b => b.group))];
   const bookable = bookablesInGroup[bookableIndex];
+
+  useEffect(() => {
+    dispatch({ type: 'FETCH_BOOKABLES_REQUEST' })
+
+    getData("http://localhost:3001/bookables")
+      .then(bookables => dispatch({
+        type: "FETCH_BOOKABLES_SUCCESS",
+        payload: bookables
+      }))
+      .catch(error => dispatch({
+        type: "FETCH_BOOKABLES_ERROR",
+        payload: error
+      }))
+  }, [])
 
   function nextBookable () {
     dispatch({
@@ -36,6 +52,14 @@ export default function BookablesList () {
       type: 'SET_GROUP',
       payload: event.target.value
     })
+  }
+
+  if(error) {
+    return <p>{error.message}</p>
+  }
+
+  if(isLoading) {
+    return <p> <Spinner/> Loading Bookables ... </p>
   }
 
   return (
